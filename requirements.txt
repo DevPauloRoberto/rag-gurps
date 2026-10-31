@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-ollama
+langchain-postgres
+pgvector
+psycopg[binary]
+sqlalchemy
+transformers
+pypdf
+gitpython

@@ -1,0 +1,35 @@
+# Ambiente virtual Python
+.venv/
+venv/
+env/
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Cache e compilados do Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Documentos locais, PDFs e repositórios clonados na ingestão
+documentos/*
+!documentos/.gitkeep
+
+# Arquivos gerados nos testes de qualidade do RAG
+qa_pairs.json
+test_qa.json
+
+# Bancos locais / dumps
+*.db
+*.sqlite3
+*.sql
+
+# IDEs e Sistema Operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
