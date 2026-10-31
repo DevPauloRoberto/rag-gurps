@@ -1,11 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from app.rag.services.qa_service import perguntar_gurps
-from app.rag.services.eval_service import (
-    dar_nota_manual,
-    avaliar_com_juiz_ia,
-    listar_avaliacoes_e_metricas,
-)
+from app.rag.services.eval_service import avaliar_qualidade_rag
 
 router = APIRouter(prefix="/rag", tags=["RAG & Avaliação"])
 
@@ -16,13 +12,11 @@ class PerguntaRequest(BaseModel):
     usar_hyde: bool = False
 
 
-class NotaManualRequest(BaseModel):
-    nota: float = Field(..., ge=0, le=10, description="Nota de 0 a 10 para a resposta")
-    comentario: str | None = None
-
-
-class JuizIARequest(BaseModel):
-    resposta_esperada: str
+class AvaliarQualidadeRequest(BaseModel):
+    limite_chunks: int = Field(default=5, ge=1, le=50)
+    k: int = Field(default=4, ge=1, le=20)
+    usar_hyde: bool = False
+    regerar_gabarito: bool = False
 
 
 @router.post("/perguntar")
@@ -34,22 +28,11 @@ def rota_perguntar(dados: PerguntaRequest):
     )
 
 
-@router.get("/avaliacoes")
-def rota_listar_avaliacoes():
-    return listar_avaliacoes_e_metricas()
-
-
-@router.patch("/avaliacoes/{avaliacao_id}/nota")
-def rota_dar_nota(avaliacao_id: int, dados: NotaManualRequest):
-    atualizado = dar_nota_manual(avaliacao_id, dados.nota, dados.comentario)
-    if not atualizado:
-        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
-    return atualizado
-
-
-@router.post("/avaliacoes/{avaliacao_id}/juiz-ia")
-def rota_juiz_ia(avaliacao_id: int, dados: JuizIARequest):
-    atualizado = avaliar_com_juiz_ia(avaliacao_id, dados.resposta_esperada)
-    if not atualizado:
-        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
-    return atualizado
+@router.post("/avaliar-qualidade")
+def rota_avaliar_qualidade(dados: AvaliarQualidadeRequest):
+    return avaliar_qualidade_rag(
+        limite_chunks=dados.limite_chunks,
+        k=dados.k,
+        usar_hyde=dados.usar_hyde,
+        regerar_gabarito=dados.regerar_gabarito,
+    )
