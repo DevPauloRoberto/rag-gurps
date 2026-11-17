@@ -8,11 +8,10 @@ llm = OllamaLLM(
     model=settings.LLM_MODEL,
     base_url=settings.OLLAMA_BASE_URL,
 )
+vector_store = get_vector_store()
 
 
 def perguntar_gurps(pergunta: str, k: int = 4, usar_hyde: bool = False):
-    vector_store = get_vector_store()
-
     # 1. Define o texto de busca (pergunta direta ou expandida com HyDE)
     texto_busca = pergunta
     if usar_hyde:

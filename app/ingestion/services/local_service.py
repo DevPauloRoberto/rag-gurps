@@ -5,6 +5,7 @@ from app.ingestion.utils.loaders import EXTENSOES_ACEITAS, carregar_arquivo
 from app.ingestion.utils.splitter import criar_splitter
 
 PASTA_DOCS = Path(settings.DOCS_DIR)
+TAMANHO_LOTE = 50
 
 def ingerir_pasta_local(chunk_size: int = settings.CHUNK_SIZE):
     PASTA_DOCS.mkdir(exist_ok=True)
@@ -16,11 +17,22 @@ def ingerir_pasta_local(chunk_size: int = settings.CHUNK_SIZE):
     try:
         for arquivo in PASTA_DOCS.iterdir():
             if arquivo.is_file() and arquivo.suffix.lower() in EXTENSOES_ACEITAS:
+                ja_existe = (
+                    db.query(FonteDocumento)
+                    .filter(FonteDocumento.nome == arquivo.name)
+                    .first()
+                )
+                if ja_existe:
+                    resultados.append({"arquivo": arquivo.name, "status": "ja_indexado"})
+                    continue
+
                 docs = carregar_arquivo(arquivo)
                 pedacos = splitter.split_documents(docs)
 
                 if pedacos:
-                    vector_store.add_documents(pedacos)
+                    for i in range(0, len(pedacos), TAMANHO_LOTE):
+                        vector_store.add_documents(pedacos[i : i + TAMANHO_LOTE])
+
                     fonte = FonteDocumento(
                         nome=arquivo.name,
                         tipo=arquivo.suffix.lower().replace(".", ""),

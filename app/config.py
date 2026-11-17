@@ -11,6 +11,7 @@ class Settings:
     DB_HOST: str = os.getenv("DB_HOST", "localhost")
     DB_PORT: str = os.getenv("DB_PORT", "5432")
     DB_NAME: str = os.getenv("DB_NAME", "gurps_rag")
+    COLLECTION_NAME: str = os.environ["COLLECTION_NAME"]
 
     # url do BD montada
     DATABASE_URL: str = (

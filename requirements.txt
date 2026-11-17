@@ -13,4 +13,6 @@ psycopg[binary]
 sqlalchemy
 transformers
 pypdf
+cryptography
+fonttools
 gitpython
