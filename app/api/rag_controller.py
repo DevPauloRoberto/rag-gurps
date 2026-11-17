@@ -8,13 +8,14 @@ router = APIRouter(prefix="/rag", tags=["RAG & Avaliação"])
 
 class PerguntaRequest(BaseModel):
     pergunta: str
-    k: int = Field(default=4, ge=1, le=20, description="Quantidade de chunks recuperados")
+    k: int = Field(default=6, ge=1, le=20, description="Quantidade de chunks recuperados")
     usar_hyde: bool = False
+    historico: list[dict] = Field(default_factory=list, description="Últimas mensagens do chat")
 
 
 class AvaliarQualidadeRequest(BaseModel):
     limite_chunks: int = Field(default=5, ge=1, le=50)
-    k: int = Field(default=4, ge=1, le=20)
+    k: int = Field(default=6, ge=1, le=20)
     usar_hyde: bool = False
     regerar_gabarito: bool = False
 
@@ -25,6 +26,7 @@ def rota_perguntar(dados: PerguntaRequest):
         pergunta=dados.pergunta,
         k=dados.k,
         usar_hyde=dados.usar_hyde,
+        historico=dados.historico,
     )
 
 

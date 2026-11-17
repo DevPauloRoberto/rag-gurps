@@ -4,9 +4,8 @@ from app.config import settings
 from langchain_ollama import OllamaEmbeddings
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text, create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
-from app.config import Settings
 
-engine = create_engine(Settings.DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -39,9 +38,11 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 def get_vector_store() -> PGVector:
+    # num_gpu=0 mantém o bge-m3 na RAM DDR5/CPU i7, liberando 100% dos 6GB da RTX 4050 para o LLM!
     embeddings = OllamaEmbeddings(
         model=settings.EMBEDDINGS_MODEL,
         base_url=settings.OLLAMA_BASE_URL,
+        num_gpu=0,
     )
     return PGVector(
         embeddings=embeddings,
